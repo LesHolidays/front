@@ -2,6 +2,7 @@
   "cleanUrls": true,
   "rewrites": [
     { "source": "/login", "destination": "/src/pages/login.html" },
-    { "source": "/feed", "destination": "/src/pages/feed.html" }
+    { "source": "/feed", "destination": "/src/pages/feed.html" },
+    { "source": "/post", "destination": "/src/pages/post.html" }
   ]
 }
