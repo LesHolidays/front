@@ -1,4 +1,7 @@
 {
   "cleanUrls": true,
-  "rewrites": [{ "source": "/test", "destination": "/src/pages/test.html" }]
+  "rewrites": [
+    { "source": "/login", "destination": "/src/pages/login.html" },
+    { "source": "/feed", "destination": "/src/pages/feed.html" }
+  ]
 }

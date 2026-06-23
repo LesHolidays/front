@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <title>Connexion</title>
+  </head>
+  <body>
+    <h1>Connexion</h1>
+    <form id="connexion-form">
+      <label>
+        Votre nom
+        <select id="select-name" name="user_id"></select>
+      </label>
+      <label>
+        Mot de passe
+        <input
+          type="password"
+          name="password"
+          autocomplete="current-password"
+        />
+      </label>
+      <input type="submit" value="Se connecter" />
+    </form>
+    <script type="module" src="/src/script/login.js"></script>
+  </body>
+</html>
