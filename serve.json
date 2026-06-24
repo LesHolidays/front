@@ -3,6 +3,7 @@
   "rewrites": [
     { "source": "/login", "destination": "/src/pages/login.html" },
     { "source": "/feed", "destination": "/src/pages/feed.html" },
-    { "source": "/post", "destination": "/src/pages/post.html" }
+    { "source": "/post", "destination": "/src/pages/post.html" },
+    { "source": "/ranking", "destination": "/src/pages/ranking.html" }
   ]
 }
