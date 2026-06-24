@@ -46,9 +46,18 @@ async function getPosts() {
     postElement.appendChild(submitButton);
     listElement.appendChild(postElement);
 
-    submitButton.addEventListener("click", () => {
+    submitButton.addEventListener("click", async () => {
       const votedUserId = +selectElement.value;
-      const answer = submitVote(votedUserId, post.post_id);
+      const answer = await submitVote(votedUserId, post.post_id);
+      if (
+        (answer.guessed == false && answer.remaining == 0) ||
+        answer.guessed == true
+      ) {
+        const answerElement = document.createElement("div");
+        answerElement.textContent = answer.creator;
+        selectElement.replaceWith(answerElement);
+        submitButton.remove();
+      }
     });
   }
 
