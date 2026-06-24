@@ -48,16 +48,20 @@ async function getCommentaries(postId) {
 
       commentaryElement.appendChild(deleteButton);
 
-      deleteButton.addEventListener("click", () => {
-        deleteCommentary(commentary.commentary_id);
-        commentaryElement.remove();
-        if (commentaries.length - 1 === 0) {
-          commentariesElement.textContent = "Aucun commentaire pour le moment";
-        }
+      deleteButton.addEventListener("click", async () => {
+        await deleteCommentary(commentary.commentary_id);
+        getCommentaries(postId);
       });
     }
     commentariesElement.appendChild(commentaryElement);
   }
+  const closeDialogButton = document.createElement("button");
+  closeDialogButton.textContent = "X";
+  commentariesElement.prepend(closeDialogButton);
+
+  closeDialogButton.addEventListener("click", () =>
+    commentariesElement.close(),
+  );
 }
 
 async function addCommentary(postId, form) {
