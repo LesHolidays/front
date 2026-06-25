@@ -90,6 +90,11 @@ async function getArchivesPosts() {
 
     const posts = await response.json();
 
+    if (posts.length === 0) {
+      listElement.textContent = "Vous n'avez pas encore posté.";
+      return;
+    }
+
     if (!Array.isArray(posts) || posts.length === 0) {
       listElement.textContent = "Aucune archive à afficher.";
       return;

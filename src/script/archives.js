@@ -81,7 +81,7 @@ async function getArchivesPosts() {
 
     const posts = await response.json();
 
-    if (!Array.isArray(posts) || posts.length === 0) {
+    if (posts.length === 0) {
       listElement.textContent = "Aucune archive à afficher.";
       return;
     }

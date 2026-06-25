@@ -100,6 +100,11 @@ async function getPosts() {
   });
   const posts = await response.json();
 
+  if (posts.length === 0) {
+    listElement.textContent = "Aucun nouveau post à afficher.";
+    return;
+  }
+
   const listElement = document.getElementById("posts-list");
 
   for (let post of posts) {
