@@ -84,7 +84,7 @@ async function getArchivesPosts() {
     });
 
     if (!response.ok) {
-      listElement.textContent = "Impossible de charger les archives.";
+      listElement.textContent = "Impossible de charger les posts.";
       return;
     }
 
@@ -96,7 +96,7 @@ async function getArchivesPosts() {
     }
 
     if (!Array.isArray(posts) || posts.length === 0) {
-      listElement.textContent = "Aucune archive à afficher.";
+      listElement.textContent = "Aucune post à afficher.";
       return;
     }
 
@@ -152,7 +152,7 @@ async function getArchivesPosts() {
     }
   } catch (error) {
     console.log(error);
-    listElement.textContent = "Erreur lors du chargement des archives.";
+    listElement.textContent = "Erreur lors du chargement des posts.";
   }
 }
 
