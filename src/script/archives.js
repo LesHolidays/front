@@ -95,10 +95,33 @@ async function getArchivesPosts() {
       const creatorElement = document.createElement("p");
       creatorElement.textContent = post.first_name + " " + post.last_name;
 
+      postElement.append(imageElement, creatorElement);
+
+      const creationDate = new Date(post.creation_date.replace(" ", "T"));
+      const now = new Date();
+      const diffInMs = Math.abs(now - creationDate);
+      const twentyFourHoursInMs = 24 * 60 * 60 * 1000;
+
+      if (diffInMs <= twentyFourHoursInMs) {
+        const commentaryForm = document.createElement("form");
+
+        const commentaryInput = document.createElement("input");
+        commentaryInput.type = "text";
+        commentaryInput.name = "message";
+        commentaryInput.placeholder = "Ajouter un commentaire";
+
+        const addCommentaryButton = document.createElement("input");
+        addCommentaryButton.value = "Envoyer";
+        addCommentaryButton.type = "submit";
+
+        commentaryForm.append(commentaryInput, addCommentaryButton);
+        postElement.appendChild(commentaryForm);
+      }
+
       const commentariesButton = document.createElement("button");
       commentariesButton.textContent = "Voir les commentaires";
 
-      postElement.append(imageElement, creatorElement, commentariesButton);
+      postElement.appendChild(commentariesButton);
       listElement.appendChild(postElement);
 
       commentariesButton.addEventListener("click", () => {
