@@ -239,8 +239,15 @@ async function getPosts() {
 }
 
 async function getActivatedUsers() {
-  const response = await fetch(apiUrl + "/users?activated=1");
+  const response = await fetch(apiUrl + "/users?activated=1", {
+    cache: "no-store",
+    headers: {
+      authorization: "Bearer " + localStorage.getItem("access_token"),
+    },
+  });
   const users = await response.json();
+
+  activatedUsers.length = 0; // vide le tableau pour éviter les doublons
 
   for (let user of users) {
     activatedUsers.push({

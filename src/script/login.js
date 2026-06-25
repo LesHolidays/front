@@ -24,7 +24,7 @@ async function login() {
 }
 
 async function getAllNames() {
-  const response = await fetch(apiUrl + "/users");
+  const response = await fetch(apiUrl + "/users", { cache: "no-store" });
   const users = await response.json();
 
   const selectElement = document.getElementById("select-name");

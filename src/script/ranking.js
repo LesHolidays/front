@@ -1,7 +1,7 @@
 import { apiUrl } from "../utils/apiUrl.js";
 
 async function getRanking() {
-  const response = await fetch(apiUrl + "/ranking");
+  const response = await fetch(apiUrl + "/ranking", { cache: "no-store" });
   const ranking = await response.json();
 
   const tableElement = document.getElementById("ranking");
