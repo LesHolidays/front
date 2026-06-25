@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="fr">
-  <head>
+    <head>
     <link rel="manifest" href="/public/manifest.json" />
     <link rel="apple-touch-icon" href="/public/icons/logo_small.png" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -12,8 +12,18 @@
       }
     </script>
     <title>Tous les posts</title>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8" / />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" / />
+    <link rel="manifest" href="/public/manifest.json" />
+    <link rel="apple-touch-icon" href="/public/icons/logo_small.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker.register("/sw.js");
+        });
+      }
+    </script>
     <title>Archives des posts</title>
     <link href="/src/style/style.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://use.typekit.net/kgq7gcy.css" />
