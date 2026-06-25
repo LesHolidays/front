@@ -1,6 +1,16 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+    <link rel="manifest" href="/public/manifest.json">
+    <link rel="apple-touch-icon" href="/public/icons/logo_small.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js');
+        });
+      }
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Accueil</title>

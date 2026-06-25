@@ -13,6 +13,10 @@ async function deleteCommentary(commentaryId) {
       },
     },
   );
+  if (!response.ok) {
+    const data = await response.json();
+    alert(data.error || "Erreur lors de la suppression du commentaire");
+  }
 }
 
 async function getCommentaries(postId) {
@@ -74,12 +78,14 @@ async function getArchivesPosts() {
       },
     });
 
+    const data = await response.json();
+
     if (!response.ok) {
-      listElement.textContent = "Impossible de charger les archives.";
+      listElement.textContent = data.error || "Impossible de charger les archives.";
       return;
     }
 
-    const posts = await response.json();
+    const posts = data;
 
     if (posts.length === 0) {
       listElement.textContent = "Aucune archive à afficher.";

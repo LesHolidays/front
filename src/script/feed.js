@@ -14,6 +14,10 @@ async function deleteCommentary(commentaryId) {
       },
     },
   );
+  if (!response.ok) {
+    const data = await response.json();
+    alert(data.error || "Erreur lors de la suppression du commentaire");
+  }
 }
 
 async function getCommentaries(postId) {
@@ -75,6 +79,12 @@ async function addCommentary(postId, form) {
     },
     body: formData,
   });
+  if (!response.ok) {
+    const data = await response.json();
+    alert(data.error || "Erreur lors de l'ajout du commentaire");
+    return false;
+  }
+  return true;
 }
 
 async function submitVote(votedUserId, postId) {
@@ -89,7 +99,12 @@ async function submitVote(votedUserId, postId) {
     },
     body: formData,
   });
-  return await response.json();
+  const data = await response.json();
+  if (!response.ok) {
+    alert(data.error || "Erreur lors du vote");
+    return { error: true };
+  }
+  return data;
 }
 
 async function getPosts() {
@@ -98,14 +113,19 @@ async function getPosts() {
       authorization: "Bearer " + localStorage.getItem("access_token"),
     },
   });
-  const posts = await response.json();
+  const data = await response.json();
+  const listElement = document.getElementById("posts-list");
+
+  if (!response.ok) {
+    listElement.textContent = data.error || "Erreur lors du chargement des posts.";
+    return;
+  }
+  const posts = data;
 
   if (posts.length === 0) {
     listElement.textContent = "Aucun nouveau post à afficher.";
     return;
   }
-
-  const listElement = document.getElementById("posts-list");
 
   for (let post of posts) {
     const postElement = document.createElement("div");
@@ -129,6 +149,14 @@ async function getPosts() {
     submitButton.addEventListener("click", async () => {
       const votedUserId = +selectElement.value;
       const answer = await submitVote(votedUserId, post.post_id);
+      if (answer.error) return;
+
+      if (answer.points_added > 0) {
+        alert("Bonne réponse ! Points gagnés : " + answer.points_added);
+      } else if (answer.guessed === false) {
+        alert("Mauvaise réponse. Essais restants : " + answer.remaining);
+      }
+
       if (
         (answer.guessed == false && answer.remaining == 0) ||
         answer.guessed == true
@@ -156,10 +184,12 @@ async function getPosts() {
         commentariesButton.textContent = "Voir les commentaires";
         postElement.appendChild(commentariesButton);
 
-        commentaryForm.addEventListener("submit", (e) => {
+        commentaryForm.addEventListener("submit", async (e) => {
           e.preventDefault();
-          addCommentary(post.post_id, e.target);
-          commentaryInput.value = "";
+          const success = await addCommentary(post.post_id, e.target);
+          if (success) {
+            commentaryInput.value = "";
+          }
         });
 
         commentariesButton.addEventListener("click", () => {

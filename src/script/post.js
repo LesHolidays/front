@@ -27,8 +27,14 @@ function post() {
             authorization: "Bearer " + localStorage.getItem("access_token"),
           },
         });
+        const data = await response.json();
         if (response.ok) {
+          if (data.points_added) {
+            alert("Post publié ! Points gagnés : " + data.points_added);
+          }
           window.location.href = "/feed";
+        } else {
+          alert(data.error || "Une erreur est survenue");
         }
       } catch (fetchError) {
         console.error("Erreur :", fetchError);

@@ -10,6 +10,12 @@ async function deletePost(post_id) {
       authorization: "Bearer " + localStorage.getItem("access_token"),
     },
   });
+  const data = await response.json();
+  if (!response.ok) {
+    alert(data.error || "Erreur lors de la suppression du post");
+  } else if (data.points_removed !== undefined) {
+    alert("Post supprimé. Points retirés : " + data.points_removed);
+  }
 }
 
 async function deleteCommentary(commentaryId) {
@@ -22,6 +28,10 @@ async function deleteCommentary(commentaryId) {
       },
     },
   );
+  if (!response.ok) {
+    const data = await response.json();
+    alert(data.error || "Erreur lors de la suppression du commentaire");
+  }
 }
 
 async function getCommentaries(postId) {
@@ -82,13 +92,15 @@ async function getArchivesPosts() {
         authorization: "Bearer " + localStorage.getItem("access_token"),
       },
     });
+    
+    const data = await response.json();
 
     if (!response.ok) {
-      listElement.textContent = "Impossible de charger les posts.";
+      listElement.textContent = data.error || "Impossible de charger les posts.";
       return;
     }
 
-    const posts = await response.json();
+    const posts = data;
 
     if (posts.length === 0) {
       listElement.textContent = "Vous n'avez pas encore posté.";

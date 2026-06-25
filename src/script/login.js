@@ -16,6 +16,9 @@ async function login() {
     const data = await response.json();
     localStorage.setItem("access_token", data.access_token);
     window.location.href = "/feed";
+  } else {
+    const data = await response.json();
+    alert(data.error || "Une erreur est survenue");
   }
 }
 
