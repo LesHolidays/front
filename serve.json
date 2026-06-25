@@ -4,8 +4,8 @@
     { "source": "/login", "destination": "/src/pages/login.html" },
     { "source": "/feed", "destination": "/src/pages/feed.html" },
     { "source": "/post", "destination": "/src/pages/post.html" },
-    { "source": "/ranking", "destination": "/src/pages/ranking.html" }
+    { "source": "/ranking", "destination": "/src/pages/ranking.html" },
     { "source": "/my_feed", "destination": "/src/pages/my_feed.html" },
-    { "source": "/archives", "destination": "/src/pages/archives.html" },
+    { "source": "/archives", "destination": "/src/pages/archives.html" }
   ]
 }
