@@ -14,8 +14,499 @@ html, body {
     margin: 0;
     padding: 0;
     height: 100%;
+    min-height: 100vh;
+    font-family: "late-serif-variable", sans-serif;
+}
+
+body {
+    background-color: #4794a7;
     display: flex;
+    flex-direction: column;
     min-height: 100vh;
 }
 
-/* login
+.main-nav {
+    width: 100%;
+    background-color: #f1e0c5;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    border-bottom: 3px solid #000000;
+    position: relative;
+    z-index: 100;
+}
+
+.nav-brand {
+    font-weight: bold;
+    font-size: 1.3rem;
+    text-transform: uppercase;
+    color: #000000;
+}
+
+.nav-responsive-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex: 1;
+}
+
+.nav-links {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: #000000;
+    font-weight: bold;
+    font-size: 1.1rem;
+    transition: color 0.2s;
+}
+
+.main-nav .nav-links a:hover, 
+.main-nav .nav-links a.active {
+    color: #778910;
+}
+
+.main-nav .btn-nav {
+    background-color: #e3ab00;
+    padding: 0.6rem 1.2rem;
+    border: 2px solid #000000;
+    border-radius: 10px;
+    white-space: nowrap;
+    text-decoration: none;
+    color: #000000;
+    font-weight: bold;
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+.main-nav .btn-nav:hover {
+    transform: translateY(-2px);
+    background-color: #778910;
+    color: #ffffff;
+}
+
+.menu-toggle {
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 30px;
+    height: 21px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    z-index: 110;
+}
+
+.menu-toggle span {
+    width: 100%;
+    height: 3px;
+    background-color: #000000;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+}
+
+.menu-toggle.open span:nth-child(1) {
+    transform: translateY(9px) rotate(45deg);
+}
+
+.menu-toggle.open span:nth-child(2) {
+    opacity: 0;
+}
+
+.menu-toggle.open span:nth-child(3) {
+    transform: translateY(-9px) rotate(-45deg);
+}
+
+.main-content {
+    flex: 1;
+    padding: 2rem;
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.page-title {
+    font-size: 2.5rem;
+    text-transform: uppercase;
+    font-style: normal;
+    font-variation-settings: "wght" 500;
+    color: #f1e0c5;
+    margin-top: 0;
+    margin-bottom: 2rem;
+}
+
+#posts-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 3rem 2rem;
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.post-card {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    width: 100%;
+}
+
+.post-creator {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #f1e0c5;
+    margin: 0;
+    padding-left: 0.2rem;
+}
+
+.post-card img {
+    width: 100%;
+    max-height: 450px;
+    height: auto;
+    object-fit: contain;
+    background-color: #1a1a1a;
+    border: 4px solid #000000;
+    border-radius: 18px;
+    box-shadow: 6px 6px 0px #000000;
+}
+
+.post-description {
+    font-size: 1.05rem;
+    color: #ffffff;
+    margin: 0;
+    padding: 0 0.2rem;
+}
+
+.post-card select,
+.post-card button,
+.post-card input[type="submit"],
+.post-card input[type="text"] {
+    margin-top: 0.2rem;
+    border: 3px solid #000000;
+    border-radius: 10px;
+    padding: 0.6rem 1rem;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.post-card input[type="text"] {
+    background-color: #ffffff;
+    color: #000000;
+}
+
+.post-card button,
+.post-card input[type="submit"] {
+    background-color: #e3ab00;
+    color: #000000;
+    cursor: pointer;
+    box-shadow: 3px 3px 0px #000000;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.post-card button:hover,
+.post-card input[type="submit"]:hover {
+    background-color: #778910;
+    color: #ffffff;
+}
+
+.post-card button:active,
+.post-card input[type="submit"]:active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0px #000000;
+}
+
+.post-card button.btn-delete {
+    background-color: #ff5c5c;
+    color: #ffffff;
+}
+
+.post-card button.btn-delete:hover {
+    background-color: #cc0000;
+    color: #ffffff;
+}
+
+.post-card form {
+    display: flex;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+#commentaries {
+    background-color: #f1e0c5;
+    border: 4px solid #000000;
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 10px 10px 0px #000000;
+    max-width: 500px;
+    width: 90%;
+    position: relative;
+}
+
+#commentaries::backdrop {
+    background: rgba(0, 0, 0, 0.5);
+}
+
+#commentaries div {
+    background: #ffffff;
+    border: 2px solid #000000;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    position: relative;
+}
+
+#commentaries p:nth-child(1) {
+    font-size: 0.9rem;
+    color: #778910;
+    margin-bottom: 0.3rem;
+}
+
+#commentaries p:nth-child(2) {
+    font-size: 1.05rem;
+    color: #000000;
+}
+
+#commentaries button {
+    margin-top: 0.5rem;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+}
+
+.btn-close-dialog {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background-color: #ff5c5c !important;
+    color: #ffffff !important;
+    border: 2px solid #000000 !important;
+    padding: 0.3rem 0.6rem !important;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.login-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.login-form {
+    background-color: #f1e0c5;
+    border: 4px solid #000000;
+    border-radius: 20px;
+    padding: 2.5rem;
+    box-shadow: 10px 10px 0px #000000;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    width: 100%;
+    max-width: 500px;
+}
+
+.login-title {
+    font-size: 2.5rem;
+    font-weight: 900;
+    margin: 0 0 0.5rem 0;
+    color: #000000;
+    text-align: center;
+}
+
+.login-form .form-label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: #000000;
+}
+
+.login-form select,
+.login-form input[type="password"] {
+    width: 100%;
+    padding: 0.8rem;
+    border: 3px solid #000000;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: bold;
+    background-color: #ffffff;
+    color: #000000;
+}
+
+.login-form .button {
+    width: 100%;
+    padding: 0.8rem;
+    border: 3px solid #000000;
+    border-radius: 10px;
+    background-color: #e3ab00;
+    color: #000000;
+    font-weight: bold;
+    font-size: 1.1rem;
+    cursor: pointer;
+    box-shadow: 4px 4px 0px #000000;
+    margin-top: 0.5rem;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.login-form .button:hover {
+    background-color: #778910;
+    color: #ffffff;
+}
+
+table {
+    width: 100%;
+    max-width: 600px;
+    margin: 2rem auto;
+    border-collapse: separate;
+    border-spacing: 0;
+    background-color: #f1e0c5;
+    border: 4px solid #000000;
+    border-radius: 20px;
+    box-shadow: 10px 10px 0px #000000;
+    overflow: hidden;
+}
+
+tr {
+    transition: background-color 0.2s;
+}
+
+tr:not(:last-child) td {
+    border-bottom: 3px solid #000000;
+}
+
+td {
+    padding: 1.2rem 1.5rem;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #000000;
+}
+
+td:nth-child(1) {
+    width: 60px;
+    text-align: center;
+    background-color: #e3ab00;
+    border-right: 3px solid #000000;
+}
+
+td:nth-child(3) {
+    text-align: right;
+    color: #778910;
+}
+
+table tr:nth-child(1) td:nth-child(1) {
+    background-color: #778910;
+    color: #ffffff;
+}
+
+table tr:nth-child(2) td:nth-child(1) {
+    background-color: #e3ab00;
+}
+
+table tr:nth-child(3) td:nth-child(1) {
+    background-color: #ffffff;
+}
+
+@media (max-width: 768px) {
+    .menu-toggle {
+        display: flex;
+    }
+
+    .nav-responsive-wrapper {
+        display: none;
+        flex-direction: column;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background-color: #f1e0c5;
+        padding: 2rem;
+        border-bottom: 3px solid #000000;
+        gap: 2rem;
+        margin-left: 0;
+    }
+
+    .nav-responsive-wrapper.open {
+        display: flex;
+    }
+
+    .nav-links {
+        flex-direction: column;
+        align-items: center;
+        gap: 1.5rem;
+        width: 100%;
+    }
+
+    .main-nav .btn-nav {
+        width: 100%;
+        max-width: 250px;
+        text-align: center;
+    }
+
+    .page-title {
+        font-size: 1.8rem;
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .main-content {
+        padding: 1rem;
+    }
+
+    #posts-list {
+        grid-template-columns: 1fr;
+        max-width: 450px;
+        margin: 0 auto;
+        gap: 2.5rem;
+        padding: 0 1rem;
+    }
+
+    .post-card img {
+        box-shadow: none !important;
+    }
+
+    .post-card button,
+    .post-card input[type="submit"] {
+        box-shadow: none !important;
+    }
+
+    .post-card button:active,
+    .post-card input[type="submit"]:active {
+        transform: none !important;
+    }
+
+    #commentaries {
+        box-shadow: none !important;
+    }
+
+    .login-form {
+        box-shadow: none !important;
+    }
+
+    .login-form .button {
+        box-shadow: none !important;
+    }
+
+    table {
+        width: 95%;
+        margin: 1rem auto;
+        box-shadow: none !important;
+    }
+    
+    td {
+        padding: 0.9rem 1rem;
+        font-size: 1rem;
+    }
+
+    .login-page {
+        padding: 2rem;
+    }
+}

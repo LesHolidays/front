@@ -4,7 +4,7 @@ import { jwtDecode } from "https://esm.sh/jwt-decode";
 const commentariesElement = document.getElementById("commentaries");
 
 async function deleteCommentary(commentaryId) {
-  const response = await fetch(
+  await fetch(
     apiUrl + "/commentaries?commentaryId=" + commentaryId,
     {
       method: "DELETE",
@@ -60,6 +60,7 @@ async function getCommentaries(postId) {
   }
   const closeDialogButton = document.createElement("button");
   closeDialogButton.textContent = "X";
+  closeDialogButton.classList.add("btn-close-dialog");
   commentariesElement.prepend(closeDialogButton);
 
   closeDialogButton.addEventListener("click", () =>
@@ -94,14 +95,20 @@ async function getArchivesPosts() {
 
     for (let post of posts) {
       const postElement = document.createElement("div");
-      const imageElement = document.createElement("img");
-      imageElement.src = post.image;
-      postElement.textContent = post.description;
+      postElement.classList.add("post-card");
 
       const creatorElement = document.createElement("p");
+      creatorElement.classList.add("post-creator");
       creatorElement.textContent = post.first_name + " " + post.last_name;
 
-      postElement.append(imageElement, creatorElement);
+      const imageElement = document.createElement("img");
+      imageElement.src = post.image;
+
+      const descriptionElement = document.createElement("p");
+      descriptionElement.classList.add("post-description");
+      descriptionElement.textContent = post.description;
+
+      postElement.append(creatorElement, imageElement, descriptionElement);
 
       const creationDate = new Date(post.creation_date.replace(" ", "T"));
       const now = new Date();

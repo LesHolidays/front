@@ -4,7 +4,7 @@ import { jwtDecode } from "https://esm.sh/jwt-decode";
 const commentariesElement = document.getElementById("commentaries");
 
 async function deletePost(post_id) {
-  const response = await fetch(apiUrl + "/posts?postId=" + post_id, {
+  await fetch(apiUrl + "/posts?postId=" + post_id, {
     method: "DELETE",
     headers: {
       authorization: "Bearer " + localStorage.getItem("access_token"),
@@ -19,7 +19,7 @@ async function deletePost(post_id) {
 }
 
 async function deleteCommentary(commentaryId) {
-  const response = await fetch(
+  await fetch(
     apiUrl + "/commentaries?commentaryId=" + commentaryId,
     {
       method: "DELETE",
@@ -75,6 +75,7 @@ async function getCommentaries(postId) {
   }
   const closeDialogButton = document.createElement("button");
   closeDialogButton.textContent = "X";
+  closeDialogButton.classList.add("btn-close-dialog");
   commentariesElement.prepend(closeDialogButton);
 
   closeDialogButton.addEventListener("click", () =>
@@ -102,33 +103,34 @@ async function getArchivesPosts() {
 
     const posts = data;
 
-    if (posts.length === 0) {
+    if (!posts || posts.length === 0) {
       listElement.textContent = "Vous n'avez pas encore posté.";
-      return;
-    }
-
-    if (!Array.isArray(posts) || posts.length === 0) {
-      listElement.textContent = "Aucune post à afficher.";
       return;
     }
 
     for (let post of posts) {
       const postElement = document.createElement("div");
+      postElement.classList.add("post-card");
+
       const imageElement = document.createElement("img");
       imageElement.src = post.image;
-      postElement.textContent = post.description;
+      
+      const descriptionElement = document.createElement("p");
+      descriptionElement.classList.add("post-description");
+      descriptionElement.textContent = post.description;
 
       const deleteButton = document.createElement("button");
-      deleteButton.textContent = "Supprimer";
-
-      postElement.appendChild(deleteButton);
+      deleteButton.textContent = "Supprimer le post";
+      deleteButton.classList.add("btn-delete");
 
       deleteButton.addEventListener("click", async () => {
-        await deletePost(post.post_id);
-        getArchivesPosts(post.post_id);
+        if (confirm("Voulez-vous vraiment supprimer ce post ?")) {
+          await deletePost(post.post_id);
+          getArchivesPosts();
+        }
       });
 
-      postElement.appendChild(imageElement);
+      postElement.append(imageElement, descriptionElement);
 
       const creationDate = new Date(post.creation_date.replace(" ", "T"));
       const now = new Date();
@@ -153,8 +155,10 @@ async function getArchivesPosts() {
 
       const commentariesButton = document.createElement("button");
       commentariesButton.textContent = "Voir les commentaires";
-
       postElement.appendChild(commentariesButton);
+
+      postElement.appendChild(deleteButton);
+
       listElement.appendChild(postElement);
 
       commentariesButton.addEventListener("click", () => {

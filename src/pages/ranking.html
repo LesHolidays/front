@@ -15,16 +15,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Classement</title>
     <link href="/src/style/style.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://use.typekit.net/kgq7gcy.css" />
   </head>
   <body>
-    <h1>Classement</h1>
-    <nav>
-      <a href="/feed">Nouveaux posts</a>
-      <a href="/archives">Tous les posts</a>
-      <a href="/my_feed">Mes posts</a>
-      <a href="/ranking">Classement</a>
+    <nav class="main-nav">
+      <div class="nav-brand"></div>
+
+      <button class="menu-toggle" aria-label="Ouvrir le menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <div class="nav-responsive-wrapper">
+        <div class="nav-links">
+          <a href="/feed">Fil d'actu</a>
+          <a href="/archives">Nos archives</a>
+          <a href="/my_feed">Mes memories</a>
+          <a href="/ranking" class="active">Scores</a>
+        </div>
+        <a href="/post" class="btn-nav">Publier</a>
+      </div>
     </nav>
-    <table id="ranking"></table>
+
+    <main class="main-content">
+      <h1 class="page-title">Scores</h1>
+      <table id="ranking"></table>
+    </main>
+
     <script type="module" src="/src/script/ranking.js"></script>
+
+    <script>
+      const menuToggle = document.querySelector(".menu-toggle");
+      const navWrapper = document.querySelector(".nav-responsive-wrapper");
+
+      menuToggle.addEventListener("click", () => {
+        menuToggle.classList.toggle("open");
+        navWrapper.classList.toggle("open");
+      });
+    </script>
   </body>
 </html>

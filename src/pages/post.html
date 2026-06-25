@@ -15,20 +15,57 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link href="/src/style/style.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://use.typekit.net/kgq7gcy.css" />
   </head>
   <body>
-    <h1>Nouveau post</h1>
-    <form id="post-form">
-      <label>
-        Photo
-        <input type="file" name="image" />
-      </label>
-      <label>
-        Description
-        <input type="text" name="description" />
-      </label>
-      <input type="submit" value="Envoyer" />
-    </form>
+    <nav class="main-nav">
+      <div class="nav-brand"></div>
+
+      <button class="menu-toggle" aria-label="Ouvrir le menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <div class="nav-responsive-wrapper">
+        <div class="nav-links">
+          <a href="/feed">Fil d'actu</a>
+          <a href="/archives">Nos archives</a>
+          <a href="/my_feed">Mes memories</a>
+          <a href="/ranking">Scores</a>
+        </div>
+        <a href="/post" class="btn-nav">Publier</a>
+      </div>
+    </nav>
+
+    <main class="main-content">
+      <h1 class="page-title">Publier</h1>
+
+      <form id="post-form" class="login-form">
+        <label class="form-label">
+          Photo :
+          <input type="file" name="image" />
+        </label>
+
+        <label class="form-label">
+          Description :
+          <input type="password" name="description" autocomplete="off" />
+        </label>
+
+        <input type="submit" value="Envoyer" class="button" />
+      </form>
+    </main>
+
     <script type="module" src="/src/script/post.js"></script>
+
+    <script>
+      const menuToggle = document.querySelector(".menu-toggle");
+      const navWrapper = document.querySelector(".nav-responsive-wrapper");
+
+      menuToggle.addEventListener("click", () => {
+        menuToggle.classList.toggle("open");
+        navWrapper.classList.toggle("open");
+      });
+    </script>
   </body>
 </html>
