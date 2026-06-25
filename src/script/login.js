@@ -1,4 +1,5 @@
 import { apiUrl } from "../utils/apiUrl.js";
+import { showToast } from "../utils/toast.js";
 
 let userAlreadyExists = true;
 
@@ -18,7 +19,7 @@ async function login() {
     window.location.href = "/feed";
   } else {
     const data = await response.json();
-    alert(data.error || "Une erreur est survenue");
+    showToast(data.error || "Une erreur est survenue", "error");
   }
 }
 

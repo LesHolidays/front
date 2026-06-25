@@ -1,20 +1,28 @@
 <!doctype html>
 <html lang="fr">
   <head>
-    <link rel="manifest" href="/public/manifest.json">
-    <link rel="apple-touch-icon" href="/public/icons/logo_small.png">
-    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="manifest" href="/public/manifest.json" />
+    <link rel="apple-touch-icon" href="/public/icons/logo_small.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
     <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js');
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker.register("/sw.js");
         });
       }
     </script>
-    <title>Boire Duperrier à la coco</title>
+    <title>LesHolidays</title>
+    <script>
+      // Redirection selon si l'utilisateur a un token ou non
+      const token = localStorage.getItem("access_token");
+      if (token) {
+        window.location.replace("/feed");
+      } else {
+        window.location.replace("/login");
+      }
+    </script>
   </head>
-  <body>
-    <h1>Boire Duperrier à la coco</h1>
-    <a href="login">Se connecter</a>
-  </body>
+  <body></body>
 </html>

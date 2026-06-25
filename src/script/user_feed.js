@@ -1,25 +1,36 @@
 import { apiUrl } from "../utils/apiUrl.js";
 import { jwtDecode } from "https://esm.sh/jwt-decode";
+import { showToast } from "../utils/toast.js";
 
 const commentariesElement = document.getElementById("commentaries");
 
+function redirectIfUnauthorized(response) {
+  if (response.status === 401) {
+    localStorage.removeItem("access_token");
+    window.location.href = "/login";
+    return true;
+  }
+  return false;
+}
+
 async function deletePost(post_id) {
-  await fetch(apiUrl + "/posts?postId=" + post_id, {
+  const response = await fetch(apiUrl + "/posts?postId=" + post_id, {
     method: "DELETE",
     headers: {
       authorization: "Bearer " + localStorage.getItem("access_token"),
     },
   });
+  if (redirectIfUnauthorized(response)) return;
   const data = await response.json();
   if (!response.ok) {
-    alert(data.error || "Erreur lors de la suppression du post");
+    showToast(data.error || "Erreur lors de la suppression du post", "error");
   } else if (data.points_removed !== undefined) {
-    alert("Post supprimé. Points retirés : " + data.points_removed);
+    showToast("Post supprimé. -" + Math.abs(data.points_removed) + " points", "info");
   }
 }
 
 async function deleteCommentary(commentaryId) {
-  await fetch(
+  const response = await fetch(
     apiUrl + "/commentaries?commentaryId=" + commentaryId,
     {
       method: "DELETE",
@@ -28,9 +39,10 @@ async function deleteCommentary(commentaryId) {
       },
     },
   );
+  if (redirectIfUnauthorized(response)) return;
   if (!response.ok) {
     const data = await response.json();
-    alert(data.error || "Erreur lors de la suppression du commentaire");
+    showToast(data.error || "Erreur lors de la suppression du commentaire", "error");
   }
 }
 
@@ -41,46 +53,48 @@ async function getCommentaries(postId) {
       authorization: "Bearer " + localStorage.getItem("access_token"),
     },
   });
+  if (redirectIfUnauthorized(response)) return;
   const commentaries = await response.json();
 
-  if (!commentaries || commentaries.length === 0) {
-    commentariesElement.textContent = "Aucun commentaire pour le moment";
-  } else {
-    commentariesElement.textContent = "";
-  }
-  for (let commentary of commentaries) {
-    const commentaryElement = document.createElement("div");
-    const nameElement = document.createElement("p");
-    const messageElement = document.createElement("p");
-    nameElement.textContent =
-      commentary.first_name + " " + commentary.last_name[0] + ".";
-    messageElement.textContent = commentary.commentary;
-
-    commentaryElement.append(nameElement, messageElement);
-
-    if (
-      commentary.user_id == jwtDecode(localStorage.getItem("access_token")).sub
-    ) {
-      const deleteButton = document.createElement("button");
-      deleteButton.textContent = "Supprimer";
-
-      commentaryElement.appendChild(deleteButton);
-
-      deleteButton.addEventListener("click", async () => {
-        await deleteCommentary(commentary.commentary_id);
-        getCommentaries(postId);
-      });
-    }
-    commentariesElement.appendChild(commentaryElement);
-  }
   const closeDialogButton = document.createElement("button");
   closeDialogButton.textContent = "X";
   closeDialogButton.classList.add("btn-close-dialog");
-  commentariesElement.prepend(closeDialogButton);
+  commentariesElement.innerHTML = "";
+  commentariesElement.appendChild(closeDialogButton);
 
   closeDialogButton.addEventListener("click", () =>
     commentariesElement.close(),
   );
+
+  if (!commentaries || commentaries.length === 0) {
+    const emptyMsg = document.createElement("p");
+    emptyMsg.textContent = "Aucun commentaire pour le moment";
+    commentariesElement.appendChild(emptyMsg);
+  } else {
+    for (let commentary of commentaries) {
+      const commentaryElement = document.createElement("div");
+      const nameElement = document.createElement("p");
+      const messageElement = document.createElement("p");
+      nameElement.textContent =
+        commentary.first_name + " " + commentary.last_name[0] + ".";
+      messageElement.textContent = commentary.commentary;
+
+      commentaryElement.append(nameElement, messageElement);
+
+      if (
+        commentary.user_id == jwtDecode(localStorage.getItem("access_token")).sub
+      ) {
+        const deleteButton = document.createElement("button");
+        deleteButton.textContent = "Supprimer";
+        commentaryElement.appendChild(deleteButton);
+        deleteButton.addEventListener("click", async () => {
+          await deleteCommentary(commentary.commentary_id);
+          getCommentaries(postId);
+        });
+      }
+      commentariesElement.appendChild(commentaryElement);
+    }
+  }
 }
 
 async function getArchivesPosts() {
@@ -93,7 +107,8 @@ async function getArchivesPosts() {
         authorization: "Bearer " + localStorage.getItem("access_token"),
       },
     });
-    
+    if (redirectIfUnauthorized(response)) return;
+
     const data = await response.json();
 
     if (!response.ok) {
@@ -114,7 +129,7 @@ async function getArchivesPosts() {
 
       const imageElement = document.createElement("img");
       imageElement.src = post.image;
-      
+
       const descriptionElement = document.createElement("p");
       descriptionElement.classList.add("post-description");
       descriptionElement.textContent = post.description;
@@ -150,6 +165,27 @@ async function getArchivesPosts() {
         addCommentaryButton.type = "submit";
 
         commentaryForm.append(commentaryInput, addCommentaryButton);
+
+        commentaryForm.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const formData = new FormData(e.target);
+          formData.append("postId", post.post_id);
+          const res = await fetch(apiUrl + "/commentaries", {
+            method: "POST",
+            headers: {
+              authorization: "Bearer " + localStorage.getItem("access_token"),
+            },
+            body: formData,
+          });
+          if (redirectIfUnauthorized(res)) return;
+          if (!res.ok) {
+            const errData = await res.json();
+            showToast(errData.error || "Erreur lors de l'ajout du commentaire", "error");
+          } else {
+            commentaryInput.value = "";
+          }
+        });
+
         postElement.appendChild(commentaryForm);
       }
 
