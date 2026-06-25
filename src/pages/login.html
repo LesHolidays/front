@@ -1,12 +1,26 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="manifest" href="/public/manifest.json" />
+    <link rel="apple-touch-icon" href="/public/icons/logo_small.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker.register("/sw.js");
+        });
+      }
+    </script>
     <title>Connexion</title>
-    <link href="/src/style/style.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://use.typekit.net/kgq7gcy.css">
-</head>
+    <link href="/src/style/style.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://use.typekit.net/kgq7gcy.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"
+    />
+  </head>
   <body class="login-page">
     <form id="connexion-form" class="login-form">
       <h1 class="login-title">Connexion</h1>
@@ -22,8 +36,9 @@
           autocomplete="current-password"
         />
       </label>
-      <input type="submit" value="Se connecter" class="button"/>
+      <input type="submit" value="Se connecter" class="button" />
     </form>
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script type="module" src="/src/script/login.js"></script>
   </body>
 </html>

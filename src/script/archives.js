@@ -1,18 +1,33 @@
 import { apiUrl } from "../utils/apiUrl.js";
 import { jwtDecode } from "https://esm.sh/jwt-decode";
+import { showToast } from "../utils/toast.js";
 
 const commentariesElement = document.getElementById("commentaries");
 
+function redirectIfUnauthorized(response) {
+  if (response.status === 401) {
+    localStorage.removeItem("access_token");
+    window.location.href = "/login";
+    return true;
+  }
+  return false;
+}
+
 async function deleteCommentary(commentaryId) {
-  await fetch(
-    apiUrl + "/commentaries?commentaryId=" + commentaryId,
-    {
-      method: "DELETE",
-      headers: {
-        authorization: "Bearer " + localStorage.getItem("access_token"),
-      },
+  await fetch(apiUrl + "/commentaries?commentaryId=" + commentaryId, {
+    method: "DELETE",
+    headers: {
+      authorization: "Bearer " + localStorage.getItem("access_token"),
     },
-  );
+  });
+  if (redirectIfUnauthorized(response)) return;
+  if (!response.ok) {
+    const data = await response.json();
+    showToast(
+      data.error || "Erreur lors de la suppression du commentaire",
+      "error",
+    );
+  }
 }
 
 async function getCommentaries(postId) {
@@ -22,46 +37,49 @@ async function getCommentaries(postId) {
       authorization: "Bearer " + localStorage.getItem("access_token"),
     },
   });
+  if (redirectIfUnauthorized(response)) return;
   const commentaries = await response.json();
 
-  if (!commentaries || commentaries.length === 0) {
-    commentariesElement.textContent = "Aucun commentaire pour le moment";
-  } else {
-    commentariesElement.textContent = "";
-  }
-  for (let commentary of commentaries) {
-    const commentaryElement = document.createElement("div");
-    const nameElement = document.createElement("p");
-    const messageElement = document.createElement("p");
-    nameElement.textContent =
-      commentary.first_name + " " + commentary.last_name[0] + ".";
-    messageElement.textContent = commentary.commentary;
-
-    commentaryElement.append(nameElement, messageElement);
-
-    if (
-      commentary.user_id == jwtDecode(localStorage.getItem("access_token")).sub
-    ) {
-      const deleteButton = document.createElement("button");
-      deleteButton.textContent = "Supprimer";
-
-      commentaryElement.appendChild(deleteButton);
-
-      deleteButton.addEventListener("click", async () => {
-        await deleteCommentary(commentary.commentary_id);
-        getCommentaries(postId);
-      });
-    }
-    commentariesElement.appendChild(commentaryElement);
-  }
   const closeDialogButton = document.createElement("button");
   closeDialogButton.textContent = "X";
   closeDialogButton.classList.add("btn-close-dialog");
-  commentariesElement.prepend(closeDialogButton);
+  commentariesElement.innerHTML = "";
+  commentariesElement.appendChild(closeDialogButton);
 
   closeDialogButton.addEventListener("click", () =>
     commentariesElement.close(),
   );
+
+  if (!commentaries || commentaries.length === 0) {
+    const emptyMsg = document.createElement("p");
+    emptyMsg.textContent = "Aucun commentaire pour le moment";
+    commentariesElement.appendChild(emptyMsg);
+  } else {
+    for (let commentary of commentaries) {
+      const commentaryElement = document.createElement("div");
+      const nameElement = document.createElement("p");
+      const messageElement = document.createElement("p");
+      nameElement.textContent =
+        commentary.first_name + " " + commentary.last_name[0] + ".";
+      messageElement.textContent = commentary.commentary;
+
+      commentaryElement.append(nameElement, messageElement);
+
+      if (
+        commentary.user_id ==
+        jwtDecode(localStorage.getItem("access_token")).sub
+      ) {
+        const deleteButton = document.createElement("button");
+        deleteButton.textContent = "Supprimer";
+        commentaryElement.appendChild(deleteButton);
+        deleteButton.addEventListener("click", async () => {
+          await deleteCommentary(commentary.commentary_id);
+          getCommentaries(postId);
+        });
+      }
+      commentariesElement.appendChild(commentaryElement);
+    }
+  }
 }
 
 async function getArchivesPosts() {
@@ -74,13 +92,17 @@ async function getArchivesPosts() {
         authorization: "Bearer " + localStorage.getItem("access_token"),
       },
     });
+    if (redirectIfUnauthorized(response)) return;
+
+    const data = await response.json();
 
     if (!response.ok) {
-      listElement.textContent = "Impossible de charger les archives.";
+      listElement.textContent =
+        data.error || "Impossible de charger les archives.";
       return;
     }
 
-    const posts = await response.json();
+    const posts = data;
 
     if (posts.length === 0) {
       listElement.textContent = "Aucune archive à afficher.";
@@ -122,6 +144,30 @@ async function getArchivesPosts() {
         addCommentaryButton.type = "submit";
 
         commentaryForm.append(commentaryInput, addCommentaryButton);
+
+        commentaryForm.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const formData = new FormData(e.target);
+          formData.append("postId", post.post_id);
+          const res = await fetch(apiUrl + "/commentaries", {
+            method: "POST",
+            headers: {
+              authorization: "Bearer " + localStorage.getItem("access_token"),
+            },
+            body: formData,
+          });
+          if (redirectIfUnauthorized(res)) return;
+          if (!res.ok) {
+            const errData = await res.json();
+            showToast(
+              errData.error || "Erreur lors de l'ajout du commentaire",
+              "error",
+            );
+          } else {
+            commentaryInput.value = "";
+          }
+        });
+
         postElement.appendChild(commentaryForm);
       }
 

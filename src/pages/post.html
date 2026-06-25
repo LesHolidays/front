@@ -1,17 +1,30 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nouveau post</title>
-    <link href="/src/style/style.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://use.typekit.net/kgq7gcy.css">
-</head>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Publier</title>
+    <link href="/src/style/style.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://use.typekit.net/kgq7gcy.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"
+    />
+    <link rel="manifest" href="/public/manifest.json" />
+    <link rel="apple-touch-icon" href="/public/icons/logo_small.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker.register("/sw.js");
+        });
+      }
+    </script>
+  </head>
   <body>
-
     <nav class="main-nav">
       <div class="nav-brand"></div>
-      
+
       <button class="menu-toggle" aria-label="Ouvrir le menu">
         <span></span>
         <span></span>
@@ -31,31 +44,32 @@
 
     <main class="main-content">
       <h1 class="page-title">Publier</h1>
-      
+
       <form id="post-form" class="login-form">
         <label class="form-label">
           Photo :
           <input type="file" name="image" />
         </label>
-        
+
         <label class="form-label">
           Description :
-          <input type="password" name="description" autocomplete="off" />
+          <input type="text" name="description" autocomplete="off" />
         </label>
-        
+
         <input type="submit" value="Envoyer" class="button" />
       </form>
     </main>
 
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script type="module" src="/src/script/post.js"></script>
-    
-    <script>
-      const menuToggle = document.querySelector('.menu-toggle');
-      const navWrapper = document.querySelector('.nav-responsive-wrapper');
 
-      menuToggle.addEventListener('click', () => {
-        menuToggle.classList.toggle('open');
-        navWrapper.classList.toggle('open');
+    <script>
+      const menuToggle = document.querySelector(".menu-toggle");
+      const navWrapper = document.querySelector(".nav-responsive-wrapper");
+
+      menuToggle.addEventListener("click", () => {
+        menuToggle.classList.toggle("open");
+        navWrapper.classList.toggle("open");
       });
     </script>
   </body>
