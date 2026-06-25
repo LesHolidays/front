@@ -5,23 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Connexion</title>
     <link href="/src/style/style.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.typekit.net/kgq7gcy.css">
 </head>
-  <body>
-    <h1>Connexion</h1>
-    <form id="connexion-form">
-      <label>
-        Votre nom
+  <body class="login-page">
+    <form id="connexion-form" class="login-form">
+      <h1 class="login-title">Connexion</h1>
+      <label class="form-label">
+        Qui es-tu ?
         <select id="select-name" name="user_id"></select>
       </label>
-      <label>
-        Mot de passe
+      <label class="form-label">
+        Entre ton mot de passe :
         <input
           type="password"
           name="password"
           autocomplete="current-password"
         />
       </label>
-      <input type="submit" value="Se connecter" />
+      <input type="submit" value="Se connecter" class="button"/>
     </form>
     <script type="module" src="/src/script/login.js"></script>
   </body>

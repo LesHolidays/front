@@ -5,7 +5,7 @@ const activatedUsers = [];
 const commentariesElement = document.getElementById("commentaries");
 
 async function deleteCommentary(commentaryId) {
-  const response = await fetch(
+  await fetch(
     apiUrl + "/commentaries?commentaryId=" + commentaryId,
     {
       method: "DELETE",
@@ -57,6 +57,7 @@ async function getCommentaries(postId) {
   }
   const closeDialogButton = document.createElement("button");
   closeDialogButton.textContent = "X";
+  closeDialogButton.classList.add("btn-close-dialog");
   commentariesElement.prepend(closeDialogButton);
 
   closeDialogButton.addEventListener("click", () =>
@@ -68,7 +69,7 @@ async function addCommentary(postId, form) {
   const formData = new FormData(form);
   formData.append("postId", postId);
 
-  const response = await fetch(apiUrl + "/commentaries", {
+  await fetch(apiUrl + "/commentaries", {
     method: "POST",
     headers: {
       authorization: "Bearer " + localStorage.getItem("access_token"),
@@ -99,21 +100,25 @@ async function getPosts() {
     },
   });
   const posts = await response.json();
+  const listElement = document.getElementById("posts-list");
 
   if (posts.length === 0) {
     listElement.textContent = "Aucun nouveau post à afficher.";
     return;
   }
 
-  const listElement = document.getElementById("posts-list");
-
   for (let post of posts) {
     const postElement = document.createElement("div");
+    postElement.classList.add("post-card");
+
     const imageElement = document.createElement("img");
     imageElement.src = post.image;
-    postElement.textContent = post.description;
-    const selectElement = document.createElement("select");
 
+    const descriptionElement = document.createElement("p");
+    descriptionElement.classList.add("post-description");
+    descriptionElement.textContent = post.description;
+
+    const selectElement = document.createElement("select");
     for (let user of activatedUsers) {
       const optionElement = document.createElement("option");
       optionElement.value = user.userId;
@@ -123,7 +128,8 @@ async function getPosts() {
 
     const submitButton = document.createElement("button");
     submitButton.textContent = "Voter";
-    postElement.append(imageElement, selectElement, submitButton);
+
+    postElement.append(imageElement, descriptionElement, selectElement, submitButton);
     listElement.appendChild(postElement);
 
     submitButton.addEventListener("click", async () => {
@@ -169,17 +175,6 @@ async function getPosts() {
       }
     });
   }
-
-  selectElement.addEventListener("change", (e) => {
-    const isSelectedUserActivated = users.find(
-      (user) => user.user_id === +e.target.value,
-    ).activated;
-    if (isSelectedUserActivated == 1) {
-      userAlreadyExists = true;
-    } else {
-      userAlreadyExists = false;
-    }
-  });
 }
 
 async function getActivatedUsers() {
