@@ -3,6 +3,15 @@ import { jwtDecode } from "https://esm.sh/jwt-decode";
 
 const commentariesElement = document.getElementById("commentaries");
 
+async function deletePost(post_id) {
+  const response = await fetch(apiUrl + "/posts?postId=" + post_id, {
+    method: "DELETE",
+    headers: {
+      authorization: "Bearer " + localStorage.getItem("access_token"),
+    },
+  });
+}
+
 async function deleteCommentary(commentaryId) {
   const response = await fetch(
     apiUrl + "/commentaries?commentaryId=" + commentaryId,
@@ -92,10 +101,17 @@ async function getArchivesPosts() {
       imageElement.src = post.image;
       postElement.textContent = post.description;
 
-      const creatorElement = document.createElement("p");
-      creatorElement.textContent = post.first_name + " " + post.last_name;
+      const deleteButton = document.createElement("button");
+      deleteButton.textContent = "Supprimer";
 
-      postElement.append(imageElement, creatorElement);
+      postElement.appendChild(deleteButton);
+
+      deleteButton.addEventListener("click", async () => {
+        await deletePost(post.post_id);
+        getArchivesPosts(post.post_id);
+      });
+
+      postElement.appendChild(imageElement);
 
       const creationDate = new Date(post.creation_date.replace(" ", "T"));
       const now = new Date();
