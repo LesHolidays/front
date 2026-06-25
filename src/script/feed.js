@@ -92,6 +92,15 @@ async function submitVote(votedUserId, postId) {
   return await response.json();
 }
 
+async function deletepost(post_id) {
+  const response = await fetch(apiUrl + "/posts?postId=" + post_id, {
+    method: "DELETE",
+    headers: {
+      authorization: "Bearer " + localStorage.getItem("access_token"),
+    },
+  });
+}
+
 async function getPosts() {
   const response = await fetch(apiUrl + "/posts", {
     headers: {
@@ -108,12 +117,26 @@ async function getPosts() {
     imageElement.src = post.image;
     postElement.textContent = post.description;
     const selectElement = document.createElement("select");
+
     for (let user of activatedUsers) {
       const optionElement = document.createElement("option");
       optionElement.value = user.userId;
       optionElement.textContent = user.firstName + " " + user.lastName;
       selectElement.appendChild(optionElement);
     }
+
+    if (post.user_id == jwtDecode(localStorage.getItem("access_token")).sub) {
+      const deleteButton = document.createElement("button");
+      deleteButton.textContent = "Supprimer";
+
+      postElement.appendChild(deleteButton);
+
+      deleteButton.addEventListener("click", async () => {
+        await deletepost(post.post_id);
+        getpost(post.post_id);
+      });
+    }
+
     const submitButton = document.createElement("button");
     submitButton.textContent = "Voter";
     postElement.append(imageElement, selectElement, submitButton);
