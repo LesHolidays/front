@@ -1,20 +1,23 @@
 <!doctype html>
 <html lang="fr">
   <head>
-    <link rel="manifest" href="/public/manifest.json">
-    <link rel="apple-touch-icon" href="/public/icons/logo_small.png">
-    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="manifest" href="/public/manifest.json" />
+    <link rel="apple-touch-icon" href="/public/icons/logo_small.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
     <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js');
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker.register("/sw.js");
         });
       }
     </script>
     <title>Nouvelle photo</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="/src/style/style.css" rel="stylesheet" />
   </head>
   <body>
-    <h1>Nouvelle photo</h1>
+    <h1>Nouveau post</h1>
     <form id="post-form">
       <label>
         Photo
