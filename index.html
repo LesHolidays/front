@@ -15,7 +15,6 @@
     </script>
     <title>LesHolidays</title>
     <script>
-      // Redirection selon si l'utilisateur a un token ou non
       const token = localStorage.getItem("access_token");
       if (token) {
         window.location.replace("/feed");

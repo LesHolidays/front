@@ -2,7 +2,7 @@ import { apiUrl } from "../utils/apiUrl.js";
 import { jwtDecode } from "https://esm.sh/jwt-decode";
 import { showToast } from "../utils/toast.js";
 
-const commentariesElement = document.getElementById("commentaries");
+const dialogElement = document.getElementById("dialog");
 
 let currentPage = 1;
 let isLoading = false;
@@ -69,17 +69,15 @@ async function getCommentaries(postId, commentariesButton) {
   const closeDialogButton = document.createElement("button");
   closeDialogButton.textContent = "X";
   closeDialogButton.classList.add("btn-close-dialog");
-  commentariesElement.innerHTML = "";
-  commentariesElement.appendChild(closeDialogButton);
+  dialogElement.innerHTML = "";
+  dialogElement.appendChild(closeDialogButton);
 
-  closeDialogButton.addEventListener("click", () =>
-    commentariesElement.close(),
-  );
+  closeDialogButton.addEventListener("click", () => dialogElement.close());
 
   if (!commentaries || commentaries.length === 0) {
     const emptyMsg = document.createElement("p");
     emptyMsg.textContent = "Aucun commentaire pour le moment";
-    commentariesElement.appendChild(emptyMsg);
+    dialogElement.appendChild(emptyMsg);
   } else {
     for (let commentary of commentaries) {
       const commentaryElement = document.createElement("div");
@@ -103,7 +101,7 @@ async function getCommentaries(postId, commentariesButton) {
           getCommentaries(postId, commentariesButton);
         });
       }
-      commentariesElement.appendChild(commentaryElement);
+      dialogElement.appendChild(commentaryElement);
     }
   }
 }
@@ -126,7 +124,6 @@ function renderPost(post, listElement) {
   deleteButton.addEventListener("click", async () => {
     if (confirm("Voulez-vous vraiment supprimer ce post ?")) {
       await deletePost(post.post_id);
-      // Recharge depuis la page 1
       currentPage = 1;
       listElement.innerHTML = "";
       await loadPosts(currentPage);
@@ -142,6 +139,9 @@ function renderPost(post, listElement) {
 
   const commentariesButton = document.createElement("button");
   commentariesButton.textContent = `Voir les commentaires (${post.commentary_count ?? 0})`;
+
+  const getVotesButton = document.createElement("button");
+  getVotesButton.textContent = `Voir qui a trouvé (${post.guess_count ?? 0})`;
 
   if (diffInMs <= twentyFourHoursInMs) {
     const commentaryForm = document.createElement("form");
@@ -177,7 +177,6 @@ function renderPost(post, listElement) {
         );
       } else {
         commentaryInput.value = "";
-        // Mettre à jour le count après ajout
         getCommentaries(post.post_id, commentariesButton);
       }
     });
@@ -185,16 +184,62 @@ function renderPost(post, listElement) {
     postElement.appendChild(commentaryForm);
   }
 
-  postElement.appendChild(commentariesButton);
+  postElement.append(commentariesButton, getVotesButton);
 
   postElement.appendChild(deleteButton);
 
   listElement.appendChild(postElement);
 
   commentariesButton.addEventListener("click", () => {
-    commentariesElement.showModal();
+    dialogElement.showModal();
     getCommentaries(post.post_id, commentariesButton);
   });
+
+  getVotesButton.addEventListener("click", () => {
+    dialogElement.showModal();
+    getWhoGuessed(post.post_id, post.user_id, getVotesButton);
+  });
+}
+
+async function getWhoGuessed(postId, postCreatorId, getVotesButton) {
+  const response = await fetch(
+    apiUrl + "/votes?postId=" + postId + "&postCreatorId=" + postCreatorId,
+    {
+      method: "GET",
+      headers: {
+        authorization: "Bearer " + localStorage.getItem("access_token"),
+      },
+    },
+  );
+  if (redirectIfUnauthorized(response)) return;
+  const users = await response.json();
+
+  if (getVotesButton) {
+    getVotesButton.textContent = `Voir qui a trouvé (${users.length})`;
+  }
+
+  const closeDialogButton = document.createElement("button");
+  closeDialogButton.textContent = "X";
+  closeDialogButton.classList.add("btn-close-dialog");
+  dialogElement.innerHTML = "";
+  dialogElement.appendChild(closeDialogButton);
+
+  closeDialogButton.addEventListener("click", () => dialogElement.close());
+
+  if (!users || users.length === 0) {
+    const emptyMsg = document.createElement("p");
+    emptyMsg.textContent = "Personne n'a trouvé la réponse pour le moment";
+    dialogElement.appendChild(emptyMsg);
+  } else {
+    for (let user of users) {
+      const userElement = document.createElement("div");
+      const nameElement = document.createElement("p");
+      nameElement.textContent = user.first_name + " " + user.last_name[0] + ".";
+
+      userElement.appendChild(nameElement);
+      dialogElement.appendChild(userElement);
+    }
+  }
 }
 
 function updateLoadMoreButton(hasMore) {

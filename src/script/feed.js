@@ -3,7 +3,7 @@ import { jwtDecode } from "https://esm.sh/jwt-decode";
 import { showToast } from "../utils/toast.js";
 
 const activatedUsers = [];
-const commentariesElement = document.getElementById("commentaries");
+const dialogElement = document.getElementById("dialog");
 
 let currentPage = 1;
 let isLoading = false;
@@ -51,17 +51,15 @@ async function getCommentaries(postId, commentariesButton) {
   const closeDialogButton = document.createElement("button");
   closeDialogButton.textContent = "X";
   closeDialogButton.classList.add("btn-close-dialog");
-  commentariesElement.innerHTML = "";
-  commentariesElement.appendChild(closeDialogButton);
+  dialogElement.innerHTML = "";
+  dialogElement.appendChild(closeDialogButton);
 
-  closeDialogButton.addEventListener("click", () =>
-    commentariesElement.close(),
-  );
+  closeDialogButton.addEventListener("click", () => dialogElement.close());
 
   if (!commentaries || commentaries.length === 0) {
     const emptyMsg = document.createElement("p");
     emptyMsg.textContent = "Aucun commentaire pour le moment";
-    commentariesElement.appendChild(emptyMsg);
+    dialogElement.appendChild(emptyMsg);
   } else {
     for (let commentary of commentaries) {
       const commentaryElement = document.createElement("div");
@@ -85,7 +83,7 @@ async function getCommentaries(postId, commentariesButton) {
           getCommentaries(postId, commentariesButton);
         });
       }
-      commentariesElement.appendChild(commentaryElement);
+      dialogElement.appendChild(commentaryElement);
     }
   }
 }
@@ -210,13 +208,12 @@ function renderPost(post, listElement) {
         const success = await addCommentary(post.post_id, e.target);
         if (success) {
           commentaryInput.value = "";
-          // Mettre à jour le count après ajout
           getCommentaries(post.post_id, commentariesButton);
         }
       });
 
       commentariesButton.addEventListener("click", () => {
-        commentariesElement.showModal();
+        dialogElement.showModal();
         getCommentaries(post.post_id, commentariesButton);
       });
     }
@@ -279,7 +276,6 @@ function updateLoadMoreButton(hasMore) {
         currentPage++;
         await loadPosts(currentPage);
       });
-      // Insérer le bouton après la liste
       listElement.parentNode.insertBefore(btn, listElement.nextSibling);
     }
     btn.disabled = false;

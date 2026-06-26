@@ -11,7 +11,7 @@ export function showToast(message, type = "default") {
   Toastify({
     text: message,
     duration: 4000,
-    gravity: "top",
+    gravity: "bottom",
     position: "right",
     style: {
       background: backgrounds[type] || backgrounds.default,
