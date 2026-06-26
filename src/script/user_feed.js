@@ -30,7 +30,7 @@ async function deletePost(post_id) {
   } else if (data.points_removed !== undefined) {
     showToast(
       "Post supprimé. -" + Math.abs(data.points_removed) + " points",
-      "info",
+      "success",
     );
   }
 }

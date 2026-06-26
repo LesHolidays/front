@@ -172,7 +172,7 @@ function renderPost(post, listElement) {
     } else if (answer.guessed === false) {
       showToast(
         "Mauvaise réponse. Essais restants : " + answer.remaining,
-        "info",
+        "error",
       );
     }
 
