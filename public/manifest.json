@@ -6,17 +6,17 @@
   "theme_color": "#F9F9F9",
   "icons": [
     {
-      "src": "/icons/logo_small.png",
+      "src": "/public/icons/logo_small.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "/icons/logo.png",
+      "src": "/public/icons/logo.png",
       "type": "image/png",
       "sizes": "512x512"
     }
   ],
-  "start_url": "https://holidays.super-sympa.fr/",
+  "start_url": "/",
   "dir": "auto",
   "lang": "fr",
   "orientation": "portrait"
