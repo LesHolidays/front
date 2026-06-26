@@ -5,6 +5,9 @@ import { showToast } from "../utils/toast.js";
 const activatedUsers = [];
 const commentariesElement = document.getElementById("commentaries");
 
+let currentPage = 1;
+let isLoading = false;
+
 function redirectIfUnauthorized(response) {
   if (response.status === 401) {
     localStorage.removeItem("access_token");
@@ -31,7 +34,7 @@ async function deleteCommentary(commentaryId) {
   }
 }
 
-async function getCommentaries(postId) {
+async function getCommentaries(postId, commentariesButton) {
   const response = await fetch(apiUrl + "/commentaries?postId=" + postId, {
     method: "GET",
     headers: {
@@ -40,6 +43,10 @@ async function getCommentaries(postId) {
   });
   if (redirectIfUnauthorized(response)) return;
   const commentaries = await response.json();
+
+  if (commentariesButton) {
+    commentariesButton.textContent = `Voir les commentaires (${commentaries.length})`;
+  }
 
   const closeDialogButton = document.createElement("button");
   closeDialogButton.textContent = "X";
@@ -75,7 +82,7 @@ async function getCommentaries(postId) {
         commentaryElement.appendChild(deleteButton);
         deleteButton.addEventListener("click", async () => {
           await deleteCommentary(commentary.commentary_id);
-          getCommentaries(postId);
+          getCommentaries(postId, commentariesButton);
         });
       }
       commentariesElement.appendChild(commentaryElement);
@@ -87,7 +94,7 @@ async function addCommentary(postId, form) {
   const formData = new FormData(form);
   formData.append("postId", postId);
 
-  await fetch(apiUrl + "/commentaries", {
+  const response = await fetch(apiUrl + "/commentaries", {
     method: "POST",
     headers: {
       authorization: "Bearer " + localStorage.getItem("access_token"),
@@ -124,8 +131,107 @@ async function submitVote(votedUserId, postId) {
   return data;
 }
 
-async function getPosts() {
-  const response = await fetch(apiUrl + "/posts", {
+function renderPost(post, listElement) {
+  const postElement = document.createElement("div");
+  postElement.classList.add("post-card");
+
+  const imageElement = document.createElement("img");
+  imageElement.src = post.image;
+
+  const descriptionElement = document.createElement("p");
+  descriptionElement.classList.add("post-description");
+  descriptionElement.textContent = post.description;
+
+  const selectElement = document.createElement("select");
+  for (let user of activatedUsers) {
+    const optionElement = document.createElement("option");
+    optionElement.value = user.userId;
+    optionElement.textContent = user.firstName + " " + user.lastName;
+    selectElement.appendChild(optionElement);
+  }
+
+  const submitButton = document.createElement("button");
+  submitButton.textContent = "Voter";
+
+  postElement.append(
+    imageElement,
+    descriptionElement,
+    selectElement,
+    submitButton,
+  );
+  listElement.appendChild(postElement);
+
+  submitButton.addEventListener("click", async () => {
+    const votedUserId = +selectElement.value;
+    const answer = await submitVote(votedUserId, post.post_id);
+    if (answer.error) return;
+
+    if (answer.points_added > 0) {
+      showToast(
+        "Bonne réponse ! +" + answer.points_added + " points",
+        "success",
+      );
+    } else if (answer.guessed === false) {
+      showToast(
+        "Mauvaise réponse. Essais restants : " + answer.remaining,
+        "info",
+      );
+    }
+
+    if (
+      (answer.guessed == false && answer.remaining == 0) ||
+      answer.guessed == true
+    ) {
+      const answerElement = document.createElement("div");
+      answerElement.textContent = answer.creator;
+      selectElement.replaceWith(answerElement);
+
+      const commentaryForm = document.createElement("form");
+
+      const commentaryInput = document.createElement("input");
+      commentaryInput.type = "text";
+      commentaryInput.name = "message";
+      commentaryInput.placeholder = "Ajouter un commentaire";
+
+      const addCommentaryButton = document.createElement("input");
+      addCommentaryButton.value = "Envoyer";
+      addCommentaryButton.type = "submit";
+
+      commentaryForm.append(commentaryInput, addCommentaryButton);
+
+      submitButton.replaceWith(commentaryForm);
+
+      const commentariesButton = document.createElement("button");
+      commentariesButton.textContent = `Voir les commentaires (${post.commentary_count ?? 0})`;
+      postElement.appendChild(commentariesButton);
+
+      commentaryForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const success = await addCommentary(post.post_id, e.target);
+        if (success) {
+          commentaryInput.value = "";
+          // Mettre à jour le count après ajout
+          getCommentaries(post.post_id, commentariesButton);
+        }
+      });
+
+      commentariesButton.addEventListener("click", () => {
+        commentariesElement.showModal();
+        getCommentaries(post.post_id, commentariesButton);
+      });
+    }
+  });
+}
+
+async function loadPosts(page) {
+  if (isLoading) return;
+  isLoading = true;
+
+  const listElement = document.getElementById("posts-list");
+  const loadMoreBtn = document.getElementById("load-more-btn");
+  if (loadMoreBtn) loadMoreBtn.disabled = true;
+
+  const response = await fetch(apiUrl + "/posts?page=" + page, {
     headers: {
       authorization: "Bearer " + localStorage.getItem("access_token"),
     },
@@ -133,108 +239,53 @@ async function getPosts() {
   if (redirectIfUnauthorized(response)) return;
 
   const data = await response.json();
-  const listElement = document.getElementById("posts-list");
 
   if (!response.ok) {
-    listElement.textContent =
-      data.error || "Erreur lors du chargement des posts.";
+    if (page === 1)
+      listElement.textContent =
+        data.error || "Erreur lors du chargement des posts.";
+    isLoading = false;
     return;
   }
-  const posts = data;
 
-  if (posts.length === 0) {
+  const { posts, has_more } = data;
+
+  if (page === 1 && posts.length === 0) {
     listElement.textContent = "Aucun nouveau post à afficher.";
+    updateLoadMoreButton(false);
+    isLoading = false;
     return;
   }
 
   for (let post of posts) {
-    const postElement = document.createElement("div");
-    postElement.classList.add("post-card");
+    renderPost(post, listElement);
+  }
 
-    const imageElement = document.createElement("img");
-    imageElement.src = post.image;
+  updateLoadMoreButton(has_more);
+  isLoading = false;
+}
 
-    const descriptionElement = document.createElement("p");
-    descriptionElement.classList.add("post-description");
-    descriptionElement.textContent = post.description;
+function updateLoadMoreButton(hasMore) {
+  let btn = document.getElementById("load-more-btn");
+  const listElement = document.getElementById("posts-list");
 
-    const selectElement = document.createElement("select");
-    for (let user of activatedUsers) {
-      const optionElement = document.createElement("option");
-      optionElement.value = user.userId;
-      optionElement.textContent = user.firstName + " " + user.lastName;
-      selectElement.appendChild(optionElement);
+  if (hasMore) {
+    if (!btn) {
+      btn = document.createElement("button");
+      btn.id = "load-more-btn";
+      btn.textContent = "Voir plus";
+      btn.classList.add("btn-load-more");
+      btn.addEventListener("click", async () => {
+        currentPage++;
+        await loadPosts(currentPage);
+      });
+      // Insérer le bouton après la liste
+      listElement.parentNode.insertBefore(btn, listElement.nextSibling);
     }
-
-    const submitButton = document.createElement("button");
-    submitButton.textContent = "Voter";
-
-    postElement.append(
-      imageElement,
-      descriptionElement,
-      selectElement,
-      submitButton,
-    );
-    listElement.appendChild(postElement);
-
-    submitButton.addEventListener("click", async () => {
-      const votedUserId = +selectElement.value;
-      const answer = await submitVote(votedUserId, post.post_id);
-      if (answer.error) return;
-
-      if (answer.points_added > 0) {
-        showToast(
-          "Bonne réponse ! +" + answer.points_added + " points",
-          "success",
-        );
-      } else if (answer.guessed === false) {
-        showToast(
-          "Mauvaise réponse. Essais restants : " + answer.remaining,
-          "info",
-        );
-      }
-
-      if (
-        (answer.guessed == false && answer.remaining == 0) ||
-        answer.guessed == true
-      ) {
-        const answerElement = document.createElement("div");
-        answerElement.textContent = answer.creator;
-        selectElement.replaceWith(answerElement);
-
-        const commentaryForm = document.createElement("form");
-
-        const commentaryInput = document.createElement("input");
-        commentaryInput.type = "text";
-        commentaryInput.name = "message";
-        commentaryInput.placeholder = "Ajouter un commentaire";
-
-        const addCommentaryButton = document.createElement("input");
-        addCommentaryButton.value = "Envoyer";
-        addCommentaryButton.type = "submit";
-
-        commentaryForm.append(commentaryInput, addCommentaryButton);
-
-        submitButton.replaceWith(commentaryForm);
-
-        const commentariesButton = document.createElement("button");
-        commentariesButton.textContent = "Voir les commentaires";
-        postElement.appendChild(commentariesButton);
-
-        commentaryForm.addEventListener("submit", async (e) => {
-          e.preventDefault();
-          const success = await addCommentary(post.post_id, e.target);
-          if (success) {
-            commentaryInput.value = "";
-          }
-        });
-
-        commentariesButton.addEventListener("click", () => {
-          commentariesElement.showModal();
-          getCommentaries(post.post_id);
-        });
-      }
-    });
+    btn.disabled = false;
+    btn.style.display = "";
+  } else {
+    if (btn) btn.style.display = "none";
   }
 }
 
@@ -247,7 +298,7 @@ async function getActivatedUsers() {
   });
   const users = await response.json();
 
-  activatedUsers.length = 0; // vide le tableau pour éviter les doublons
+  activatedUsers.length = 0;
 
   for (let user of users) {
     activatedUsers.push({
@@ -260,5 +311,5 @@ async function getActivatedUsers() {
 
 document.addEventListener("DOMContentLoaded", async () => {
   await getActivatedUsers();
-  getPosts();
+  loadPosts(currentPage);
 });
