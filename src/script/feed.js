@@ -189,6 +189,7 @@ function renderPost(post, listElement) {
       const commentaryInput = document.createElement("input");
       commentaryInput.type = "text";
       commentaryInput.name = "message";
+      commentaryInput.required = true;
       commentaryInput.placeholder = "Ajouter un commentaire";
 
       const addCommentaryButton = document.createElement("input");
